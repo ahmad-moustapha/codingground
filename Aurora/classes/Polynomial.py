@@ -28,6 +28,18 @@ def coxDeBoor(knots, i, p):
     
 # If p>0
 
+# Repeated Expressions used in calculation, this ease readibility
+
+R1 = 1/(knots[i+p]-knots[i])
+R2 =  1/(knots[i+p+1]-knots[i+1])
+UR1 = R1*knots[i]
+UR2 = R2*knots[i+p+1]
+
+# Loop over the knot spans of the spline
+# According to cox-de-boor a spline of degree p is non-zero over p+1 knot span [i,i+1), ... , [i+p, i+p+1)
+
+for iter1 in range(1,p+1):
+    
 
         
     
