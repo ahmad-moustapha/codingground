@@ -24,7 +24,8 @@ def coxDeBoor(knots, i, p):
  # According to cox-de-boor recursive formula if p=0 (initial or default case) the spline will be defined as 1 over the corresponding knot span
  # [i,i+1) and zero elsewhere
   if p==0:
-    return Polynomial(knots[i], knots[i+1], [1])
+        polynomials = [Polynomial(knots[i], knots[i+1], [1])]
+    return Spline(0,polynomials)
     
 # If p>0
 
@@ -35,12 +36,41 @@ R2 =  1/(knots[i+p+1]-knots[i+1])
 UR1 = R1*knots[i]
 UR2 = R2*knots[i+p+1]
 
-# Loop over the knot spans of the spline
+
 # According to cox-de-boor a spline of degree p is non-zero over p+1 knot span [i,i+1), ... , [i+p, i+p+1)
+# Initilize the polynomials array of the new spline - each polynomial corresponds to a knot span  
+polynomials = [None]*(p+1)   
 
-for iter1 in range(1,p+1):
+# Loop over the knot spans of the spline
+for iter1 in range(0,p+1):
     
-
+    # A spline function in cox-de-boor algo depends on the two previous splines with degree p-1 and index i and i+1
+    prevSpline1 = coxDeBoor(knots,i,p-1)
+    prevSpline2 = coxDeBoor(knots,i+1,p-1)
+   
+    # Get the coefficicents of the polynomial functions corresponding to the splines at  intervals [(i,i+1),...,(i+p,i+p+1)]
+    prevSplineCoef1 = prevSpline1.evalOverInterval(knots[i+iter1],knots[i+iter1+1]).coefficients
+    prevSplineCoef2 = prevSpline2.evalOverInterval(knots[i+iter1],knots[i+iter1+1]).coefficients
+    
+    # Initilize the coeffiecient array of the polynomial function of the new spline over the interval (i+iter1,i+iter1+1)
+    # A polynomial with degree p have p+1 coefficients
+    coefficients = [None]*(p+1)
+    
+    # Calculate the highest degree of the new spline - it depends on the highest degree coefficient of the previous splines
+    coefficients[p] = R1*prevSplineCoef1[prevSpline1.degree] - R2*prevSplineCoef2[prevSpline2.degree]
+    
+    # Calculate the lowest degree which depends on the lowest degree of the previous spline polynomial function
+    coefficients[0] = -UR1*prevSplineCoef1[0] + UR2*prevSplineCoef2[0]
+    
+    # Calculate the rest of the coefficients where a coefficient k in the new function depends on the coefficients k-1 and k of
+    # the previous splines.
+    for iter2 in range(1,p):
+        
+        coefficients[iter2] = R1*prevSplineCoef1[iter2-1] - R2*prevSplineCoef2[iter2-1] - UR1*prevSplineCoef1[iter2] + UR2*prevSplineCoef2[iter2]
+    
+    polynomials[iter1] = Polynomial(knots[i+iter1], knots[i+iter1+1], coefficients)
+    
+return Spline(p,polynomials)
         
     
     
