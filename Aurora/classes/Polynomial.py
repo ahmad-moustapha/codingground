@@ -6,7 +6,10 @@ class Polynomial:
         self.coefficients = coefficients
     
     def __str__(self):
-        return 'Ploynomial: ' + str(self.coefficients) + ' Non-Zero over: (' + str(self.start) + ', ' + str(self.end) + ')'  
+        return 'Ploynomial: ' + str(self.coefficients) + ' Non-Zero over: (' + str(self.start) + ', ' + str(self.end) + ')' 
+    
+    def asTupple(self):
+        return [self.start,self.end]+self.coefficients
     
 class Spline:
     
@@ -19,6 +22,12 @@ class Spline:
             if polynomial.start == start and polynomial.end == end:
                 return polynomial
         return Polynomial(start, end, [0 for i in range(self.degree+1)]) 
+    
+    def asTupples(self):
+        tupples= []
+        for polynomial in self.polynomials:
+            tupples=tupples+polynomial.asTupple()
+        return tupples    
     
     def __str__(self):
         return 'Spline of degree ' + str(self.degree) + ':\n' + str(map(str,self.polynomials))
@@ -88,8 +97,11 @@ def splineBasis(interval, degree, Knots=null, nbasis):
         lowerBound = interval[0]
         upperBound = interval[1]
         knots=[lowerBound + x*(upperBound-lowerBound)/nknots for x in range(nknots+1)]
+    splines = [None] * nbasis
     
-    
+    for i in range(nbasis):
+        splines[i]= coxDeBoor(knots,i,degree)
+    return splines
     
     
 s = coxDeBoor([0,1,2,3],0,2)
