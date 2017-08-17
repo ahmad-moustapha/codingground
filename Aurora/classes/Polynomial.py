@@ -79,6 +79,18 @@ def coxDeBoor(knots, i, p):
     
         polynomials[iter1] = Polynomial(knots[i+iter1], knots[i+iter1+1], coefficients)
     return Spline(p,polynomials)
-        
+ 
+def splineBasis(interval, degree, Knots=null, nbasis):
+    # TODO validate input
+    
+    if isnull(knots):
+        nknots = nbasis+degree+1
+        lowerBound = interval[0]
+        upperBound = interval[1]
+        knots=[lowerBound + x*(upperBound-lowerBound)/nknots for x in range(nknots+1)]
+    
+    
+    
+    
 s = coxDeBoor([0,1,2,3],0,2)
 print(s)
